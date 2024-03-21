@@ -30,10 +30,17 @@ class Mensagem{
         }else{
             return true;
         }
+    }
 
+    public function validaAssuntoVazio(){
         if(empty($this->assunto)){
+            $assuntoVazio = true;
             return $assuntoVazio;
         }
+    }
+
+    public function mensagemValidada(){
+
     }
 }
 
@@ -42,11 +49,16 @@ $mensagem->__set('destinatario', $_POST['destinatario']);
 $mensagem->__set('assunto', $_POST['assunto']);
 $mensagem->__set('mensagem', $_POST['mensagem']);
 
-$mensagem->validaMensagem();
 
+$mensagem->validaMensagem();
 if(!$mensagem->validaMensagem()){
     echo 'Mensagem não é válida';
     header("Location: index.php?msg=erro");
+}
+
+$mensagem->validaAssuntoVazio();
+if($mensagem->validaAssuntoVazio() && $mensagem->validaMensagem()){
+    header("Location: index.php?msg=assuntovazio");
 }
 
 $mail = new PHPMailer(true);
@@ -56,8 +68,8 @@ try {
     $mail->isSMTP();                                            //Send using SMTP
     $mail->Host       = 'smtp-mail.outlook.com';                     //Set the SMTP server to send through
     $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-    $mail->Username   = 'apps3ndma1l@outlook.com';                     //SMTP username
-    $mail->Password   = '*@#abcd1234';                               //SMTP password
+    $mail->Username   = '';   //preencha este campo com email outlook                  //SMTP username
+    $mail->Password   = '';  //preencha com a senha do email                             //SMTP password
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  //STARTTLS       //Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
     $mail->Port       = 587;                                    //TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
 
@@ -80,6 +92,7 @@ try {
     $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
     $mail->send();
+    header("Location: index.php?msg=enviado");
     echo 'Message has been sent';
 } catch (Exception $e) {
     echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
